@@ -1,25 +1,34 @@
 package org.example.meetroomreservation.domain;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private Integer meetroom_id;
-    private Integer user_id;
-    private Timestamp date;
+   /* private Integer meetroom_id;
+    private Integer user_id;*/
+   @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")
+    private LocalDateTime datetime;
+    @DateTimeFormat(pattern = "HH:mm")
     private Time duration;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Meetroom meetroom;
 
     public Reservation(){}
 
-    public Reservation(Integer user_id, Integer meetroom_id, Timestamp date, Time duration) {
-        this.user_id = user_id;
-        this.meetroom_id = meetroom_id;
-        this.date = date;
+    public Reservation( LocalDateTime datetime, Time duration) {
+        this.datetime = datetime;
         this.duration = duration;
     }
 
@@ -27,7 +36,7 @@ public class Reservation {
         return id;
     }
 
-    public Integer getUser_id() {
+ /*   public Integer getUser_id() {
         return user_id;
     }
 
@@ -40,14 +49,14 @@ public class Reservation {
 
     public void setMeetroom_id(Integer meetroom_id) {
         this.meetroom_id = meetroom_id;
+    }*/
+
+    public LocalDateTime getDatetime() {
+        return datetime;
     }
 
-    public Timestamp getDate() {
-        return date;
-    }
-
-    public void setDate(Timestamp date) {
-        this.date = date;
+    public void setDatetime(LocalDateTime datetime) {
+        this.datetime = datetime;
     }
 
     public Time getDuration() {
@@ -56,5 +65,21 @@ public class Reservation {
 
     public void setDuration(Time duration) {
         this.duration = duration;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Meetroom getMeetroom() {
+        return meetroom;
+    }
+
+    public void setMeetroom(Meetroom meetroom) {
+        this.meetroom = meetroom;
     }
 }

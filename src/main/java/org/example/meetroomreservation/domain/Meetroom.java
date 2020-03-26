@@ -12,9 +12,15 @@ public class Meetroom {
 
     public Meetroom(){ }
 
-    public Meetroom(String name, String location) {
+    public Meetroom(Integer id, String name, String location) {
+        this.id = id;
         this.name = name;
         this.location = location;
+    }
+
+    public Meetroom(Integer id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public  Integer getId(){
