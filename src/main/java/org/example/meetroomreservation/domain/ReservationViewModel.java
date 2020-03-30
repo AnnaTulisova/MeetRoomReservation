@@ -2,45 +2,37 @@ package org.example.meetroomreservation.domain;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
-import java.sql.Time;
-import java.sql.Timestamp;
+import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
-@Entity
-public class Reservation {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class ReservationViewModel {
     private Integer id;
-   @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")
+    @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")
     private LocalDateTime datetime;
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime duration;
-
-    @ManyToOne
-    private User user;
-
-    @ManyToOne
+    private List<User> users;
     private Meetroom meetroom;
 
-    public Reservation(){}
 
-    public Reservation( LocalDateTime datetime, LocalTime duration) {
+    public ReservationViewModel(){}
+
+    public ReservationViewModel(Integer id, LocalDateTime datetime, LocalTime duration, List<User> users, Meetroom meetroom) {
+        this.id = id;
         this.datetime = datetime;
         this.duration = duration;
-    }
-
-    public Reservation(LocalDateTime datetime, LocalTime duration, User user, Meetroom meetroom) {
-        this.id = null;
-        this.datetime = datetime;
-        this.duration = duration;
-        this.user = user;
+        this.users = users;
         this.meetroom = meetroom;
     }
 
-    public  Integer getId(){
+    public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public LocalDateTime getDatetime() {
@@ -59,12 +51,12 @@ public class Reservation {
         this.duration = duration;
     }
 
-    public User getUser() {
-        return user;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public Meetroom getMeetroom() {

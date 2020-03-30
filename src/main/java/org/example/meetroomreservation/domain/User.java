@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,8 +22,16 @@ public class User implements UserDetails {
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
+    @OneToMany
+    @JoinColumn(name = "userId")
+    private List<Reservation> reservations;
 
     public User(){ }
+
+    public User(Integer id, String email) {
+        this.id = id;
+        this.email = email;
+    }
 
     public User(Integer id, String email, String login, String password, Set<Role> roles) {
         this.id = id;
@@ -64,6 +73,13 @@ public class User implements UserDetails {
     }
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
     @Override

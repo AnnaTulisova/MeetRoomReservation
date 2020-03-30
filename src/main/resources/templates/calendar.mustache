@@ -11,14 +11,30 @@
     <input type="submit" value="Sign Out"/>
 </form>
 
-{{#meetrooms}}
-    {{id}}
-    {{name}}
-    {{location}}
+
+<a href="/add">Add new reserv!</a>
+<br>
+<br>
+Reservations
+<br>
+<br>
+<hr>
+{{#reservations}}
+    Date: {{datetime}} <br>
+    Duration: {{duration}}
     <br>
-{{/meetrooms}}
-{{#message}}
-    {{message}}
-{{/message}}
+    <br>
+    <i>Users:</i>
+    <br>
+    {{#users}}
+        {{id}}
+        {{email}}
+        <br>
+    {{/users}}
+    <b>Room -</b> {{meetroom.name}}
+    <a href="/calendar/reservation?meetroom_id={{meetroom.id}}&datetime={{datetime}}">Show reserv </a>
+    <hr>
+{{/reservations}}
+
 </body>
 </html>

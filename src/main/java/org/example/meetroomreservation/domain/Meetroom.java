@@ -1,6 +1,7 @@
 package org.example.meetroomreservation.domain;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Meetroom {
@@ -23,6 +24,10 @@ public class Meetroom {
         this.name = name;
     }
 
+    @OneToMany
+    @JoinColumn(name = "meetroom_id")
+    private List<Reservation> reservations;
+
     public  Integer getId(){
         return id;
     }
@@ -41,5 +46,13 @@ public class Meetroom {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 }

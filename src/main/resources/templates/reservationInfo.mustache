@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Reservation</title>
+</head>
+<body>
+{{#reservation}}
+    Date: {{datetime}} <br>
+    Duration: {{duration}}
+    <br>
+    <br>
+    <i>Users:</i>
+    <br>
+    {{#users}}
+        {{id}}
+        {{email}}
+        <br>
+    {{/users}}
+    <b>Room -</b> {{meetroom.name}}
+{{/reservation}}
+<form method="post" action="/calendar/reservation/delete">
+    <input type="hidden" name="meetroom_id" value="{{meetroom_id}}">
+    <input type="hidden" name="datetime" value="{{datetime}}">
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
+    <input type="submit" value="Delete Reserv">
+</form>
+<a href="reservation/edit?meetroom_id={{meetroom_id}}&datetime={{datetime}}">Edit!</a>
+<a href="/calendar">Go back!</a>
+
+</body>
+</html>

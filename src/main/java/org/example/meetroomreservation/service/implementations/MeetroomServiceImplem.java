@@ -35,4 +35,6 @@ public class MeetroomServiceImplem implements MeetroomService {
                         .map(m-> new Meetroom(m.getId(), m.getName(), m.getLocation()))
                         .collect(Collectors.toList());
     }
+
+    public Meetroom findById(Integer id){return meetroomRepository.getOne(id);}
 }

@@ -7,4 +7,5 @@ import java.util.List;
 public interface MeetroomService {
     List<Meetroom> findAll();
     List<Meetroom> findAll(boolean onlyNames);
+    Meetroom findById(Integer id);
 }
