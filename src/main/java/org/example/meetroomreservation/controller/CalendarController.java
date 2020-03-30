@@ -84,7 +84,7 @@ public class CalendarController {
         return "edit";
     }
     @PostMapping("/calendar/reservation/edit")
-    private String editPost(@RequestParam String datetime, @RequestParam Integer meetroom_id,
+    private String editReservation(@RequestParam String datetime, @RequestParam Integer meetroom_id,
             @RequestParam String newdatetime, @RequestParam Integer newmeetroom_id,
             @RequestParam String user_ids, @RequestParam String duration, Map<String, Object> model){
 
