@@ -30,34 +30,38 @@ public class UserServiceImplem implements UserService {
         userRepository.save(user);
     }
 
-    public String getUserIdsFromReservation(ReservationViewModel reservationViewModel){
-        String  user_ids = "";
-        for(User u : reservationViewModel.getUsers()){
-            user_ids +=u.getId().toString() + ";";
+    public String getUserIdsFromReservation(ReservationViewModel reservationViewModel) {
+        String  userIds = "";
+        for (User u : reservationViewModel.getUsers()) {
+            userIds += u.getId().toString() + ";";
         }
-        return  user_ids;
+        return  userIds;
     }
 
-    public List<Integer> findDifferentUsers(int[] old_ids, int[] new_ids){
-         HashSet<Integer> s = new HashSet<>();
-        for (int new_id : new_ids) s.add(new_id);
-        List<Integer> lost_ids = new ArrayList<>();
-        for (Integer old_id : old_ids)
-            if (!s.contains(old_id))
-                lost_ids.add(old_id);
-        return  lost_ids;
+    public List<Integer> findDifferentUsers(int[] oldIds, int[] newIds) {
+        HashSet<Integer> s = new HashSet<>();
+
+        for (int new_id : newIds) {
+            s.add(new_id);
+        }
+        List<Integer> lostIds = new ArrayList<>();
+
+        for (Integer oldId : oldIds)
+            if (!s.contains(oldId))
+                lostIds.add(oldId);
+        return  lostIds;
     }
 
-    public List<User> getUsersByIds(List<Integer> ids){
+    public List<User> getUsersByIds(List<Integer> ids) {
         return userRepository.findAllById(ids);
     }
 
-    public int[] updateStringIdsToIntArray(String ids){
+    public int[] updateStringIdsToIntArray(String ids) {
         return Arrays.stream(ids.split(";")).mapToInt(Integer::parseInt).toArray();
     }
 
     @Override
-    public List<User> findAll(){
+    public List<User> findAll() {
         return userRepository
                 .findAll()
                 .stream()
