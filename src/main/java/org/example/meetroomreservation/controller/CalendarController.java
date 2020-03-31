@@ -90,23 +90,39 @@ public class CalendarController {
     private String edit(@RequestParam String datetime, @RequestParam Integer meetroomId,
                         @RequestParam String newDatetime, @RequestParam Integer newMeetroomId,
                         @RequestParam String userIds, @RequestParam String duration) {
+        //find old records about reservation
         ReservationViewModel oldReservation = reservationService.findReservationsWithUsers(datetime, meetroomId);
+        //find last users for the reservation
         String oldUserIds = userService.getUserIdsFromReservation(oldReservation);
-        int[] old_ids_array = userService.updateStringIdsToIntArray(oldUserIds);
-        int[] new_ids_array = userService.updateStringIdsToIntArray(userIds);
-
-        List<Integer> usersIdsToDelete = userService.findDifferentUsers(old_ids_array, new_ids_array);
-        reservationService.deleteOldUsers(usersIdsToDelete, datetime);
-
-        if(!oldReservation.getDatetime().toString().equals(newDatetime)) oldReservation.setDatetime(LocalDateTime.parse(newDatetime));
-        if(!oldReservation.getDuration().toString().equals(duration)) oldReservation.setDuration(LocalTime.parse(duration));
-        if(!oldReservation.getMeetroom().getId().equals(newMeetroomId)) oldReservation.setMeetroom(meetroomService.findById(newMeetroomId));
-
+        //get ids array from last users ids
+        int[] oldIdsArray = userService.updateStringIdsToIntArray(oldUserIds);
+        //get ids array from new users
+        int[] newIdsArray = userService.updateStringIdsToIntArray(userIds);
+        //find not non-current users for the reservation
+        List<Integer> usersIdsToDelete = userService.findDifferentUsers(oldIdsArray, newIdsArray);
+        //delete entries with their ids in case of any
+        if(usersIdsToDelete.size() > 0){
+            reservationService.deleteOldUsers(usersIdsToDelete, datetime);
+        }
+        //check for update the reservation fields
+        //if they were updated refresh them in the reservation
+        if(!oldReservation.getDatetime().toString().equals(newDatetime)) {
+            oldReservation.setDatetime(LocalDateTime.parse(newDatetime));
+        }
+        if(!oldReservation.getDuration().toString().equals(duration)) {
+            oldReservation.setDuration(LocalTime.parse(duration));
+        }
+        if(!oldReservation.getMeetroom().getId().equals(newMeetroomId)) {
+            oldReservation.setMeetroom(meetroomService.findById(newMeetroomId));
+        }
+        //save current reservation in DB
         reservationService.saveChanges(oldReservation, datetime, meetroomId);
-
-        List<Integer> newUserIds = userService.findDifferentUsers(new_ids_array, old_ids_array);
-        reservationService.addNewUsers(newUserIds, oldReservation);
-
+        //check for the new users for the reservation
+        List<Integer> usersIdsToAdd = userService.findDifferentUsers(newIdsArray, oldIdsArray);
+        //add the users for the reservation in case of any
+        if(usersIdsToAdd.size() > 0){
+            reservationService.addNewUsers(usersIdsToAdd, oldReservation);
+        }
         return "redirect:/calendar/reservation?meetroomId="+newMeetroomId+"&datetime="+newDatetime;
     }
 }
