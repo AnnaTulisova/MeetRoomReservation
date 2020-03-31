@@ -31,17 +31,19 @@ public class CalendarController {
     private MeetroomService meetroomService;
 
     @GetMapping("/calendar")
-    public String calendar(@AuthenticationPrincipal User user, Map<String, Object> model){
+    public String calendar(Map<String, Object> model) {
         List<ReservationViewModel> reservations = reservationService.findReservationsWithUsers();
+
         model.put("reservations", reservations);
         return "calendar";
     }
 
     @GetMapping("/calendar/reservation")
-    public String reservationInfo(@RequestParam String datetime, @RequestParam Integer meetroom_id, Map<String, Object> model){
-        ReservationViewModel reservation = reservationService.findReservationsWithUsers(datetime, meetroom_id);
+    public String reservationInfo(@RequestParam String datetime, @RequestParam Integer meetroomId, Map<String, Object> model) {
+        ReservationViewModel reservation = reservationService.findReservationsWithUsers(datetime, meetroomId);
+
         model.put("reservation", reservation);
-        model.put("meetroom_id", meetroom_id);
+        model.put("meetroomId", meetroomId);
         model.put("datetime", datetime);
         return "reservationInfo";
     }
@@ -70,41 +72,41 @@ public class CalendarController {
     }
 
     @PostMapping("/calendar/reservation/delete")
-    public String delete(@RequestParam String datetime, @RequestParam Integer meetroom_id,Map<String,Object> model){
-        reservationService.deleteByDatetimeAndMeetroomId(datetime, meetroom_id);
+    public String delete(@RequestParam String datetime, @RequestParam Integer meetroomId) {
+        reservationService.deleteByDatetimeAndMeetroomId(datetime, meetroomId);
         return "redirect:/calendar";
     }
 
     @GetMapping("/calendar/reservation/edit")
-    public String edit(@RequestParam String datetime, @RequestParam Integer meetroom_id,Map<String, Object> model){
-        ReservationViewModel reservationViewModel = reservationService.findReservationsWithUsers(datetime, meetroom_id);
-        String user_ids = userService.getUserIdsFromReservation(reservationViewModel);
+    public String edit(@RequestParam String datetime, @RequestParam Integer meetroomId,Map<String, Object> model) {
+        ReservationViewModel reservationViewModel = reservationService.findReservationsWithUsers(datetime, meetroomId);
+        String userIds = userService.getUserIdsFromReservation(reservationViewModel);
         model.put("reservation", reservationViewModel);
-        model.put("user_ids", user_ids);
-        model.put("meetroom_id", reservationViewModel.getMeetroom().getId().toString());
+        model.put("userIds", userIds);
+        model.put("meetroomId", reservationViewModel.getMeetroom().getId().toString());
         return "edit";
     }
     @PostMapping("/calendar/reservation/edit")
-    private String edit(@RequestParam String datetime, @RequestParam Integer meetroom_id,
-                        @RequestParam String newdatetime, @RequestParam Integer newmeetroom_id,
-                        @RequestParam String user_ids, @RequestParam String duration, Map<String, Object> model){
-        ReservationViewModel oldReservation = reservationService.findReservationsWithUsers(datetime, meetroom_id);
+    private String edit(@RequestParam String datetime, @RequestParam Integer meetroomId,
+                        @RequestParam String newDatetime, @RequestParam Integer newMeetroomId,
+                        @RequestParam String userIds, @RequestParam String duration) {
+        ReservationViewModel oldReservation = reservationService.findReservationsWithUsers(datetime, meetroomId);
         String oldUserIds = userService.getUserIdsFromReservation(oldReservation);
         int[] old_ids_array = userService.updateStringIdsToIntArray(oldUserIds);
-        int[] new_ids_array = userService.updateStringIdsToIntArray(user_ids);
+        int[] new_ids_array = userService.updateStringIdsToIntArray(userIds);
 
         List<Integer> usersIdsToDelete = userService.findDifferentUsers(old_ids_array, new_ids_array);
         reservationService.deleteOldUsers(usersIdsToDelete, datetime);
 
-        if(!oldReservation.getDatetime().toString().equals(newdatetime)) oldReservation.setDatetime(LocalDateTime.parse(newdatetime));
+        if(!oldReservation.getDatetime().toString().equals(newDatetime)) oldReservation.setDatetime(LocalDateTime.parse(newDatetime));
         if(!oldReservation.getDuration().toString().equals(duration)) oldReservation.setDuration(LocalTime.parse(duration));
-        if(!oldReservation.getMeetroom().getId().equals(newmeetroom_id)) oldReservation.setMeetroom(meetroomService.findById(newmeetroom_id));
+        if(!oldReservation.getMeetroom().getId().equals(newMeetroomId)) oldReservation.setMeetroom(meetroomService.findById(newMeetroomId));
 
-        reservationService.saveChanges(oldReservation, datetime, meetroom_id);
+        reservationService.saveChanges(oldReservation, datetime, meetroomId);
 
         List<Integer> newUserIds = userService.findDifferentUsers(new_ids_array, old_ids_array);
         reservationService.addNewUsers(newUserIds, oldReservation);
 
-        return "redirect:/calendar/reservation?meetroom_id="+meetroom_id+"&datetime="+newdatetime;
+        return "redirect:/calendar/reservation?meetroomId="+newMeetroomId+"&datetime="+newDatetime;
     }
 }

@@ -31,21 +31,24 @@ public class ReservationServiceImplem implements ReservationService {
     private UserService userService;
 
     public List<Reservation> findAll(){ return reservationRepository.findAll();}
+
     public void save(Reservation reservation){
         reservationRepository.save(reservation);
     }
-    public List<Reservation> findByDatetimeAndMeetroomId(String datetime, Integer meetroom_id){
-        return reservationRepository.findByDatetimeAndMeetroomId(LocalDateTime.parse(datetime), meetroom_id);
+
+    public List<Reservation> findByDatetimeAndMeetroomId(String datetime, Integer meetroomId) {
+        return reservationRepository.findByDatetimeAndMeetroomId(LocalDateTime.parse(datetime), meetroomId);
     }
 
     @Override
-    public void deleteByDatetimeAndMeetroomId(String datetime, Integer meetroom_id) {
+    public void deleteByDatetimeAndMeetroomId(String datetime, Integer meetroomId) {
         reservationRepository
                 .deleteAll(reservationRepository
                         .findByDatetimeAndMeetroomId
-                        (LocalDateTime.parse(datetime), meetroom_id));
+                        (LocalDateTime.parse(datetime), meetroomId));
     }
-    public List<Reservation> findAllByOrderByDatetimeAscMeetroomIdAsc(){
+
+    public List<Reservation> findAllByOrderByDatetimeAscMeetroomIdAsc() {
         return reservationRepository.findAllByOrderByDatetimeAscMeetroomIdAsc();
     }
 

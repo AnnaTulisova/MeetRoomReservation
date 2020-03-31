@@ -18,12 +18,12 @@
     <b>Room -</b> {{meetroom.name}}
 {{/reservation}}
 <form method="post" action="/calendar/reservation/delete">
-    <input type="hidden" name="meetroom_id" value="{{meetroom_id}}">
+    <input type="hidden" name="meetroomId" value="{{meetroomId}}">
     <input type="hidden" name="datetime" value="{{datetime}}">
     <input type="hidden" name="_csrf" value="{{_csrf.token}}">
     <input type="submit" value="Delete Reserv">
 </form>
-<a href="reservation/edit?meetroom_id={{meetroom_id}}&datetime={{datetime}}">Edit!</a>
+<a href="reservation/edit?meetroomId={{meetroomId}}&datetime={{datetime}}">Edit!</a>
 <a href="/calendar">Go back!</a>
 
 </body>
