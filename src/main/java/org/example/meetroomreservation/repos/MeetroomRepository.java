@@ -7,6 +7,4 @@ import java.util.List;
 
 public interface MeetroomRepository extends JpaRepository<Meetroom, Integer> {
     List<Meetroom> findAllByOrderByIdAsc();
-
-
 }

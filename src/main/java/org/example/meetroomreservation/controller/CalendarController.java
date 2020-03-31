@@ -23,8 +23,10 @@ import java.util.Map;
 public class CalendarController {
     @Autowired
     private ReservationService reservationService;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private MeetroomService meetroomService;
 
@@ -50,26 +52,25 @@ public class CalendarController {
     }
 
     @PostMapping("/add")
-    public String addReservation(@RequestParam String user_id, @RequestParam String meetroom_id,
-                                 @RequestParam String datetime, @RequestParam String duration, Map<String, Object> model) throws ParseException {
-        if(user_id.contains(";")){
-            int[] user_ids = userService.stringIdsToArray(user_id);
-            for(Integer u_id:user_ids){
+    public String add(@RequestParam String userId, @RequestParam Integer meetroomId, @RequestParam String datetime,
+                                 @RequestParam String duration, Map<String, Object> model) throws ParseException {
+        if (userId.contains(";")) {
+            int[] userIds = userService.updateStringIdsToIntArray(userId);
+            for(Integer uId : userIds){
                 Reservation reservation = new Reservation(LocalDateTime.parse(datetime), LocalTime.parse(duration),
-                        userService.findById(u_id),  meetroomService.findById(Integer.parseInt(meetroom_id)));
+                                            userService.findById(uId),  meetroomService.findById(meetroomId));
                 reservationService.save(reservation);
             }
-        }else{
+        } else {
             Reservation reservation = new Reservation(LocalDateTime.parse(datetime),LocalTime.parse(duration),
-                    userService.findById(Integer.parseInt(user_id)), meetroomService.findById(Integer.parseInt(meetroom_id)));
+                                        userService.findById(Integer.parseInt(userId)), meetroomService.findById(meetroomId));
             reservationService.save(reservation);
         }
-
         return "redirect:/calendar";
     }
 
     @PostMapping("/calendar/reservation/delete")
-    public String deleteReserv(@RequestParam String datetime, @RequestParam Integer meetroom_id,Map<String,Object> model){
+    public String delete(@RequestParam String datetime, @RequestParam Integer meetroom_id,Map<String,Object> model){
         reservationService.deleteByDatetimeAndMeetroomId(datetime, meetroom_id);
         return "redirect:/calendar";
     }
@@ -84,14 +85,13 @@ public class CalendarController {
         return "edit";
     }
     @PostMapping("/calendar/reservation/edit")
-    private String editReservation(@RequestParam String datetime, @RequestParam Integer meetroom_id,
-            @RequestParam String newdatetime, @RequestParam Integer newmeetroom_id,
-            @RequestParam String user_ids, @RequestParam String duration, Map<String, Object> model){
-
+    private String edit(@RequestParam String datetime, @RequestParam Integer meetroom_id,
+                        @RequestParam String newdatetime, @RequestParam Integer newmeetroom_id,
+                        @RequestParam String user_ids, @RequestParam String duration, Map<String, Object> model){
         ReservationViewModel oldReservation = reservationService.findReservationsWithUsers(datetime, meetroom_id);
         String oldUserIds = userService.getUserIdsFromReservation(oldReservation);
-        int[] old_ids_array = userService.stringIdsToArray(oldUserIds);
-        int[] new_ids_array = userService.stringIdsToArray(user_ids);
+        int[] old_ids_array = userService.updateStringIdsToIntArray(oldUserIds);
+        int[] new_ids_array = userService.updateStringIdsToIntArray(user_ids);
 
         List<Integer> usersIdsToDelete = userService.findDifferentUsers(old_ids_array, new_ids_array);
         reservationService.deleteOldUsers(usersIdsToDelete, datetime);

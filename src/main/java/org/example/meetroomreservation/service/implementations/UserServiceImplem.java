@@ -19,15 +19,6 @@ import java.util.stream.Collectors;
 public class UserServiceImplem implements UserService {
     @Autowired
     private UserRepository userRepository;
-    @Override
-    public List<User> findAll(){
-        return userRepository
-                .findAll()
-                .stream()
-                .map(user -> new User(user.getId(), user.getEmail(), user.getLogin(), user.getPassword(), user.getRoles()))
-                .collect(Collectors.toList());
-
-    }
 
     public User findByEmail(String email){
         return userRepository.findByEmail(email);
@@ -60,8 +51,19 @@ public class UserServiceImplem implements UserService {
     public List<User> getUsersByIds(List<Integer> ids){
         return userRepository.findAllById(ids);
     }
-    public int[] stringIdsToArray(String ids){
+
+    public int[] updateStringIdsToIntArray(String ids){
         return Arrays.stream(ids.split(";")).mapToInt(Integer::parseInt).toArray();
+    }
+
+    @Override
+    public List<User> findAll(){
+        return userRepository
+                .findAll()
+                .stream()
+                .map(user -> new User(user.getId(), user.getEmail(), user.getLogin(), user.getPassword(), user.getRoles()))
+                .collect(Collectors.toList());
+
     }
 
     @Override

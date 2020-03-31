@@ -13,7 +13,7 @@ public interface UserService extends UserDetailsService {
     String getUserIdsFromReservation(ReservationViewModel reservationViewModel);
     List<Integer> findDifferentUsers(int[] old_ids, int[] new_ids);
     List<User> getUsersByIds(List<Integer> ids);
-    int[] stringIdsToArray(String ids);
+    int[] updateStringIdsToIntArray(String ids);
     void save(User user);
 
 }
