@@ -86,10 +86,10 @@ public class CalendarController {
         model.put("meetroomId", reservationViewModel.getMeetroom().getId().toString());
         return "edit";
     }
+
     @PostMapping("/calendar/reservation/edit")
-    private String edit(@RequestParam String datetime, @RequestParam Integer meetroomId,
-                        @RequestParam String newDatetime, @RequestParam Integer newMeetroomId,
-                        @RequestParam String userIds, @RequestParam String duration) {
+    private String edit(@RequestParam String datetime, @RequestParam Integer meetroomId, @RequestParam String newDatetime,
+                        @RequestParam Integer newMeetroomId, @RequestParam String userIds, @RequestParam String duration) {
         //find old records about reservation
         ReservationViewModel oldReservation = reservationService.findReservationsWithUsers(datetime, meetroomId);
         //find last users for the reservation

@@ -30,7 +30,7 @@ public class ReservationServiceImplem implements ReservationService {
     @Autowired
     private UserService userService;
 
-    public List<Reservation> findAll(){ return reservationRepository.findAll();}
+    public List<Reservation> findAll() { return reservationRepository.findAll();}
 
     public void save(Reservation reservation){
         reservationRepository.save(reservation);
@@ -44,8 +44,7 @@ public class ReservationServiceImplem implements ReservationService {
     public void deleteByDatetimeAndMeetroomId(String datetime, Integer meetroomId) {
         reservationRepository
                 .deleteAll(reservationRepository
-                        .findByDatetimeAndMeetroomId
-                        (LocalDateTime.parse(datetime), meetroomId));
+                        .findByDatetimeAndMeetroomId(LocalDateTime.parse(datetime), meetroomId));
     }
 
     public List<Reservation> findAllByOrderByDatetimeAscMeetroomIdAsc() {
@@ -57,36 +56,37 @@ public class ReservationServiceImplem implements ReservationService {
         return oldReservs.stream().filter(distinctByKey(x->x.getDatetime())).collect(Collectors.toList());
     }
 
-    public List<ReservationViewModel> findReservationsWithUsers(){
+    public List<ReservationViewModel> findReservationsWithUsers() {
         List<Reservation> originalReservations = findTotalReservations();
         List<ReservationViewModel> reservations = new java.util.ArrayList<>(Collections.emptyList());
-        for(Reservation r:originalReservations){
+        for (Reservation r : originalReservations) {
             List<User> usersForOneReserv =
                     findByDatetimeAndMeetroomId(r.getDatetime().toString(), r.getMeetroom().getId())
                     .stream()
                     .map(x->new User(x.getUser().getId(), x.getUser().getEmail()))
                     .collect(Collectors.toList());
-            ReservationViewModel reservationViewModel = new ReservationViewModel(r.getId(), r.getDatetime(), r.getDuration(), usersForOneReserv, r.getMeetroom());
+            ReservationViewModel reservationViewModel = new ReservationViewModel(r.getId(), r.getDatetime(),
+                                                            r.getDuration(), usersForOneReserv, r.getMeetroom());
             reservations.add(reservationViewModel);
         }
         return reservations;
     }
-    public ReservationViewModel findReservationsWithUsers(String datetime, Integer meetroom_id){
-        Reservation reservation = findByDatetimeAndMeetroomId(datetime,meetroom_id).get(0);
+    public ReservationViewModel findReservationsWithUsers(String datetime, Integer meetroomId) {
+        Reservation reservation = findByDatetimeAndMeetroomId(datetime, meetroomId).get(0);
         ReservationViewModel reservationViewModel = new ReservationViewModel();
         List<User> usersForOneReserv =
-                    findByDatetimeAndMeetroomId(datetime, meetroom_id)
+                    findByDatetimeAndMeetroomId(datetime, meetroomId)
                             .stream()
                             .map(x->new User(x.getUser().getId(), x.getUser().getEmail()))
                             .collect(Collectors.toList());
-           reservationViewModel = new ReservationViewModel(reservation.getId(), reservation.getDatetime(), reservation.getDuration(), usersForOneReserv, reservation.getMeetroom());
+        reservationViewModel = new ReservationViewModel(reservation.getId(), reservation.getDatetime(), reservation.getDuration(),
+                                usersForOneReserv, reservation.getMeetroom());
         return reservationViewModel;
     }
 
-    public void saveChanges(ReservationViewModel reservationViewModel, String datetime, Integer meetroom_id){
-        List<Reservation> old_reservations = findByDatetimeAndMeetroomId(
-                datetime,meetroom_id);
-        for(Reservation r:old_reservations){
+    public void saveChanges(ReservationViewModel reservationViewModel, String datetime, Integer meetroomId) {
+        List<Reservation> oldReservations = findByDatetimeAndMeetroomId(datetime, meetroomId);
+        for (Reservation r : oldReservations) {
             r.setMeetroom(reservationViewModel.getMeetroom());
             r.setDatetime(reservationViewModel.getDatetime());
             r.setDuration(reservationViewModel.getDuration());
@@ -94,15 +94,17 @@ public class ReservationServiceImplem implements ReservationService {
         }
     }
 
-    public void deleteOldUsers(List<Integer> user_ids, String dateTime){
-        for(Integer id:user_ids)
-          reservationRepository.deleteByDatetimeAndUserId(LocalDateTime.parse(dateTime), id);
+    public void deleteOldUsers(List<Integer> usersIds, String datetime) {
+        for (Integer id : usersIds) {
+            reservationRepository.deleteByDatetimeAndUserId(LocalDateTime.parse(datetime), id);
+        }
     }
 
-    public void addNewUsers(List<Integer> user_ids, ReservationViewModel reservationViewModel){
-        List<User> users = userService.getUsersByIds(user_ids);
-        for(User user:users){
-            Reservation reservation = new Reservation( reservationViewModel.getDatetime(), reservationViewModel.getDuration(), user, reservationViewModel.getMeetroom());
+    public void addNewUsers(List<Integer> usersIds, ReservationViewModel reservationViewModel) {
+        List<User> users = userService.getUsersByIds(usersIds);
+        for (User user : users) {
+            Reservation reservation = new Reservation( reservationViewModel.getDatetime(), reservationViewModel.getDuration(),
+                                        user, reservationViewModel.getMeetroom());
             save(reservation);
         }
     }
