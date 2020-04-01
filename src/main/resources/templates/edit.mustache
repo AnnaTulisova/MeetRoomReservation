@@ -9,8 +9,6 @@ Edit reservation
     <div><label> meetroom id: <input type="text" name="newMeetroomId" value="{{meetroomId}}"/> </label></div>
     <div><label> datetime : <input type="datetime-local" name="newDatetime" value="{{reservation.datetime}}"/> </label></div>
     <div><label> duration : <input type="time" name="duration" value="{{reservation.duration}}"/> </label></div>
-
-    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
     <input type="hidden" name="meetroomId" value="{{meetroomId}}">
     <input type="hidden" name="datetime" value="{{reservation.datetime}}">
     <div><input type="submit" value="Edit reservation"/></div>

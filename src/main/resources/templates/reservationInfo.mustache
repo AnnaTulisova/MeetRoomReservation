@@ -20,7 +20,6 @@
 <form method="post" action="/calendar/reservation/delete">
     <input type="hidden" name="meetroomId" value="{{meetroomId}}">
     <input type="hidden" name="datetime" value="{{datetime}}">
-    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
     <input type="submit" value="Delete Reserv">
 </form>
 <a href="reservation/edit?meetroomId={{meetroomId}}&datetime={{datetime}}">Edit!</a>
