@@ -24,12 +24,4 @@ public class HomeController {
     public List<User> home() {
         return  userService.findAll();
     }
-
-    @GetMapping
-    public  String home(Map<String, Object> model){
-        List<User> users = userService.findAll();
-        model.put("users", users);
-        return "home";
-    }
-
 }
