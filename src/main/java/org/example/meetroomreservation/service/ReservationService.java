@@ -1,27 +1,31 @@
 package org.example.meetroomreservation.service;
 
 import org.example.meetroomreservation.domain.Reservation;
-import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
+import org.example.meetroomreservation.domain.requestModels.ReservationAddEdit;
+import org.example.meetroomreservation.domain.requestModels.ReservationEdit;
+import org.example.meetroomreservation.domain.requestModels.ReservationRequest;
+import org.example.meetroomreservation.domain.viewModels.ReservationView;
 
 import java.util.List;
 
 public interface ReservationService {
-    ReservationViewModel findReservationsWithUsers(String datetime, Integer meetroom_id);
+    ReservationView findReservationsWithUsers(String datetime, Integer meetroom_id);
 
     List<Reservation> findAll();
     List<Reservation> findByDatetimeAndMeetroomId(String datetime, Integer meetroom_id);
 
     List<Reservation> findAllByOrderByDatetimeAscMeetroomIdAsc();
     List<Reservation> findTotalReservations();
-    List<ReservationViewModel> findReservationsWithUsers();
+    List<ReservationView> findReservationsWithUsers();
 
-    void addReservation(String userId, Integer meetroomId, String datetime, String duration);
-    void editReservation(String datetime, Integer meetroomId, String newDatetime,
-                        Integer newMeetroomId, String userIds, String duration);
-    void saveChanges(ReservationViewModel reservationViewModel, String datetime, Integer meetroom_id);
+    ReservationAddEdit getReservationForEdit(ReservationRequest reservation);
+
+    void addReservation(ReservationAddEdit reservationAddEdit);
+    void editReservation(ReservationEdit reservationEdit);
+    void saveChanges(ReservationView reservationView, String datetime, Integer meetroom_id);
     void deleteOldUsers(List<Integer> user_ids, String dateTime);
     void save(Reservation reservation);
-    void addNewUsers(List<Integer> user_ids, ReservationViewModel reservationViewModel);
+    void addNewUsers(List<Integer> user_ids, ReservationView reservationView);
     void deleteByDatetimeAndMeetroomId(String datetime, Integer meetroom_id);
 
 }

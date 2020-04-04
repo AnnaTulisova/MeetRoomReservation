@@ -1,8 +1,8 @@
 package org.example.meetroomreservation.service.implementations;
 
-import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
+import org.example.meetroomreservation.domain.viewModels.ReservationView;
 import org.example.meetroomreservation.domain.User;
-import org.example.meetroomreservation.domain.viewModels.UserViewModel;
+import org.example.meetroomreservation.domain.viewModels.UserView;
 import org.example.meetroomreservation.repos.UserRepository;
 import org.example.meetroomreservation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +31,9 @@ public class UserServiceImplem implements UserService {
         userRepository.save(user);
     }
 
-    public String getUserIdsFromReservation(ReservationViewModel reservationViewModel) {
+    public String getUserIdsFromReservation(ReservationView reservationView) {
         String  userIds = "";
-        for (UserViewModel u : reservationViewModel.getUsers()) {
+        for (UserView u : reservationView.getUsers()) {
             userIds += u.getId().toString() + ";";
         }
         return  userIds;

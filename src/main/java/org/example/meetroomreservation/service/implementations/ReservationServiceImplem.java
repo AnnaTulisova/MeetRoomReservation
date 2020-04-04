@@ -1,9 +1,12 @@
 package org.example.meetroomreservation.service.implementations;
 
 import org.example.meetroomreservation.domain.*;
-import org.example.meetroomreservation.domain.viewModels.MeetroomViewModel;
-import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
-import org.example.meetroomreservation.domain.viewModels.UserViewModel;
+import org.example.meetroomreservation.domain.requestModels.ReservationAddEdit;
+import org.example.meetroomreservation.domain.requestModels.ReservationEdit;
+import org.example.meetroomreservation.domain.requestModels.ReservationRequest;
+import org.example.meetroomreservation.domain.viewModels.MeetroomView;
+import org.example.meetroomreservation.domain.viewModels.ReservationView;
+import org.example.meetroomreservation.domain.viewModels.UserView;
 import org.example.meetroomreservation.repos.ReservationRepository;
 import org.example.meetroomreservation.service.MeetroomService;
 import org.example.meetroomreservation.service.ReservationService;
@@ -42,53 +45,60 @@ public class ReservationServiceImplem implements ReservationService {
         return reservationRepository.findByDatetimeAndMeetroomId(LocalDateTime.parse(datetime), meetroomId);
     }
 
-    public  void addReservation(String userId, Integer meetroomId,
-                                String datetime, String duration) {
-        if (userId.contains(";")) {
-            int[] userIds = userService.updateStringIdsToIntArray(userId);
+    public  void addReservation(ReservationAddEdit reservationToAdd) {
+        if (reservationToAdd.getUserIds().contains(";")) {
+            int[] userIds = userService.updateStringIdsToIntArray(reservationToAdd.getUserIds());
             for(Integer uId : userIds){
-                Reservation reservation = new Reservation(LocalDateTime.parse(datetime), LocalTime.parse(duration),
-                        userService.findById(uId),  meetroomService.findById(meetroomId));
+                Reservation reservation = new Reservation(
+                        LocalDateTime.parse(reservationToAdd.getDatetime()),
+                        LocalTime.parse(reservationToAdd.getDuration()),
+                        userService.findById(uId),
+                        meetroomService.findById(reservationToAdd.getMeetroomId()));
+
                 save(reservation);
             }
         } else {
-            Reservation reservation = new Reservation(LocalDateTime.parse(datetime),LocalTime.parse(duration),
-                    userService.findById(Integer.parseInt(userId)), meetroomService.findById(meetroomId));
+            Reservation reservation = new Reservation(
+                    LocalDateTime.parse(reservationToAdd.getDatetime()),
+                    LocalTime.parse(reservationToAdd.getDatetime()),
+                    userService.findById(Integer.parseInt(reservationToAdd.getUserIds())),
+                    meetroomService.findById(reservationToAdd.getMeetroomId()));
+
             save(reservation);
         }
 
     }
 
-    public void editReservation(String datetime, Integer meetroomId, String newDatetime,
-                                 Integer newMeetroomId, String userIds, String duration) {
+    public void editReservation(ReservationEdit reservationEdit) {
         //find old records about reservation
-        ReservationViewModel oldReservation = findReservationsWithUsers(datetime, meetroomId);
+        ReservationView oldReservation = findReservationsWithUsers(reservationEdit.getOldDatetime(),
+                reservationEdit.getOldMeetroomId());
         //find last users for the reservation
         String oldUserIds = userService.getUserIdsFromReservation(oldReservation);
         //get ids array from last users ids
         int[] oldIdsArray = userService.updateStringIdsToIntArray(oldUserIds);
         //get ids array from new users
-        int[] newIdsArray = userService.updateStringIdsToIntArray(userIds);
+        int[] newIdsArray = userService.updateStringIdsToIntArray(reservationEdit.getUserIds());
         //find not non-current users for the reservation
         List<Integer> usersIdsToDelete = userService.findDifferentUsers(oldIdsArray, newIdsArray);
         //delete entries with their ids in case of any
         if(usersIdsToDelete.size() > 0){
-            deleteOldUsers(usersIdsToDelete, datetime);
+            deleteOldUsers(usersIdsToDelete, reservationEdit.getOldDatetime());
         }
         //check for update the reservation fields
         //if they were updated refresh them in the reservation
-        if(!oldReservation.getDatetime().toString().equals(newDatetime)) {
-            oldReservation.setDatetime(LocalDateTime.parse(newDatetime));
+        if(!oldReservation.getDatetime().toString().equals(reservationEdit.getDatetime())) {
+            oldReservation.setDatetime(LocalDateTime.parse(reservationEdit.getDatetime()));
         }
-        if(!oldReservation.getDuration().toString().equals(duration)) {
-            oldReservation.setDuration(LocalTime.parse(duration));
+        if(!oldReservation.getDuration().toString().equals(reservationEdit.getDuration())) {
+            oldReservation.setDuration(LocalTime.parse(reservationEdit.getDuration()));
         }
-        if(!oldReservation.getMeetroom().getId().equals(newMeetroomId)) {
-            Meetroom newMeetroom = meetroomService.findById(newMeetroomId);
-            oldReservation.setMeetroom(new MeetroomViewModel(newMeetroom.getId(), newMeetroom.getName(), newMeetroom.getLocation()));
+        if(!oldReservation.getMeetroom().getId().equals(reservationEdit.getMeetroomId())) {
+            Meetroom newMeetroom = meetroomService.findById(reservationEdit.getMeetroomId());
+            oldReservation.setMeetroom(new MeetroomView(newMeetroom.getId(), newMeetroom.getName(), newMeetroom.getLocation()));
         }
         //save current reservation in DB
-        saveChanges(oldReservation, datetime, meetroomId);
+        saveChanges(oldReservation, reservationEdit.getOldDatetime(), reservationEdit.getOldMeetroomId());
         //check for the new users for the reservation
         List<Integer> usersIdsToAdd = userService.findDifferentUsers(newIdsArray, oldIdsArray);
         //add the users for the reservation in case of any
@@ -113,45 +123,45 @@ public class ReservationServiceImplem implements ReservationService {
         return oldReservs.stream().filter(distinctByKey(x->x.getDatetime())).collect(Collectors.toList());
     }
 
-    public List<ReservationViewModel> findReservationsWithUsers() {
+    public List<ReservationView> findReservationsWithUsers() {
         List<Reservation> originalReservations = findTotalReservations();
-        List<ReservationViewModel> reservations = new java.util.ArrayList<>(Collections.emptyList());
+        List<ReservationView> reservations = new java.util.ArrayList<>(Collections.emptyList());
         for (Reservation r : originalReservations) {
-            List<UserViewModel> usersForOneReserv =
+            List<UserView> usersForOneReserv =
                     findByDatetimeAndMeetroomId(r.getDatetime().toString(), r.getMeetroom().getId())
                     .stream()
-                    .map(x->new UserViewModel(x.getUser().getId(), x.getUser().getEmail(), x.getUser().getLogin()))
+                    .map(x->new UserView(x.getUser().getId(), x.getUser().getEmail(), x.getUser().getLogin()))
                     .collect(Collectors.toList());
 
-            MeetroomViewModel meetroom = new MeetroomViewModel(r.getMeetroom().getId(), r.getMeetroom().getName(), r.getMeetroom().getLocation());
+            MeetroomView meetroom = new MeetroomView(r.getMeetroom().getId(), r.getMeetroom().getName(), r.getMeetroom().getLocation());
 
-            ReservationViewModel reservationViewModel = new ReservationViewModel(r.getId(), r.getDatetime(),
+            ReservationView reservationView = new ReservationView(r.getId(), r.getDatetime(),
                                                             r.getDuration(), usersForOneReserv, meetroom);
-            reservations.add(reservationViewModel);
+            reservations.add(reservationView);
         }
         return reservations;
     }
-    public ReservationViewModel findReservationsWithUsers(String datetime, Integer meetroomId) {
+    public ReservationView findReservationsWithUsers(String datetime, Integer meetroomId) {
         Reservation reservation = findByDatetimeAndMeetroomId(datetime, meetroomId).get(0);
-        ReservationViewModel reservationViewModel = new ReservationViewModel();
-        List<UserViewModel> usersForOneReserv =
+        ReservationView reservationView = new ReservationView();
+        List<UserView> usersForOneReserv =
                     findByDatetimeAndMeetroomId(datetime, meetroomId)
                             .stream()
-                            .map(x->new UserViewModel(x.getUser().getId(), x.getUser().getEmail(), x.getUser().getLogin()))
+                            .map(x->new UserView(x.getUser().getId(), x.getUser().getEmail(), x.getUser().getLogin()))
                             .collect(Collectors.toList());
-        MeetroomViewModel meetroomViewModel = new MeetroomViewModel(reservation.getMeetroom().getId(), reservation.getMeetroom().getName(),
+        MeetroomView meetroomViewModel = new MeetroomView(reservation.getMeetroom().getId(), reservation.getMeetroom().getName(),
                                             reservation.getMeetroom().getLocation());
-        reservationViewModel = new ReservationViewModel(reservation.getId(), reservation.getDatetime(), reservation.getDuration(),
+        reservationView = new ReservationView(reservation.getId(), reservation.getDatetime(), reservation.getDuration(),
                                 usersForOneReserv, meetroomViewModel);
-        return reservationViewModel;
+        return reservationView;
     }
 
-    public void saveChanges(ReservationViewModel reservationViewModel, String datetime, Integer meetroomId) {
+    public void saveChanges(ReservationView reservationView, String datetime, Integer meetroomId) {
         List<Reservation> oldReservations = findByDatetimeAndMeetroomId(datetime, meetroomId);
         for (Reservation r : oldReservations) {
-            r.setMeetroom(meetroomService.findById(reservationViewModel.getMeetroom().getId()));
-            r.setDatetime(reservationViewModel.getDatetime());
-            r.setDuration(reservationViewModel.getDuration());
+            r.setMeetroom(meetroomService.findById(reservationView.getMeetroom().getId()));
+            r.setDatetime(reservationView.getDatetime());
+            r.setDuration(reservationView.getDuration());
             save(r);
         }
     }
@@ -162,13 +172,22 @@ public class ReservationServiceImplem implements ReservationService {
         }
     }
 
-    public void addNewUsers(List<Integer> usersIds, ReservationViewModel reservationViewModel) {
+    public void addNewUsers(List<Integer> usersIds, ReservationView reservationView) {
         List<User> users = userService.getUsersByIds(usersIds);
         for (User user : users) {
-            Reservation reservation = new Reservation( reservationViewModel.getDatetime(), reservationViewModel.getDuration(),
-                                        user, meetroomService.findById(reservationViewModel.getMeetroom().getId()));
+            Reservation reservation = new Reservation( reservationView.getDatetime(), reservationView.getDuration(),
+                                        user, meetroomService.findById(reservationView.getMeetroom().getId()));
             save(reservation);
         }
+    }
+
+    public ReservationAddEdit getReservationForEdit(ReservationRequest reservation){
+        ReservationView reservationFromDB =  findReservationsWithUsers(
+                reservation.getDatetime(), reservation.getMeetroomId());
+        String userIds = userService.getUserIdsFromReservation(reservationFromDB);
+        ReservationAddEdit reservationToEdit = new ReservationAddEdit(userIds, reservation.getMeetroomId(),
+                reservation.getDatetime(), reservationFromDB.getDuration().toString());
+        return  reservationToEdit;
     }
 
     public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor){
