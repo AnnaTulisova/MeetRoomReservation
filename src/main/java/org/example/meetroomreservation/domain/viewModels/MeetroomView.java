@@ -1,11 +1,11 @@
 package org.example.meetroomreservation.domain.viewModels;
 
-public class MeetroomViewModel {
+public class MeetroomView {
     private Integer id;
     private String name;
     private String location;
 
-    public MeetroomViewModel(Integer id, String name, String location) {
+    public MeetroomView(Integer id, String name, String location) {
         this.id = id;
         this.name = name;
         this.location = location;

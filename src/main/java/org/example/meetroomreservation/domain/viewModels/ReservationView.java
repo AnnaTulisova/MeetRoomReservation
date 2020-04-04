@@ -1,25 +1,24 @@
 package org.example.meetroomreservation.domain.viewModels;
 
-import org.example.meetroomreservation.domain.Meetroom;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-public class ReservationViewModel {
+public class ReservationView {
     private Integer id;
     @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")
     private LocalDateTime datetime;
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime duration;
-    private List<UserViewModel> users;
-    private MeetroomViewModel meetroom;
+    private List<UserView> users;
+    private MeetroomView meetroom;
 
 
-    public ReservationViewModel(){}
+    public ReservationView(){}
 
-    public ReservationViewModel(Integer id, LocalDateTime datetime, LocalTime duration, List<UserViewModel> users, MeetroomViewModel meetroom) {
+    public ReservationView(Integer id, LocalDateTime datetime, LocalTime duration, List<UserView> users, MeetroomView meetroom) {
         this.id = id;
         this.datetime = datetime;
         this.duration = duration;
@@ -51,19 +50,19 @@ public class ReservationViewModel {
         this.duration = duration;
     }
 
-    public List<UserViewModel> getUsers() {
+    public List<UserView> getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserViewModel> users) {
+    public void setUsers(List<UserView> users) {
        this.users = users;
     }
 
-    public MeetroomViewModel getMeetroom() {
+    public MeetroomView getMeetroom() {
         return meetroom;
     }
 
-    public void setMeetroom(MeetroomViewModel meetroom) {
+    public void setMeetroom(MeetroomView meetroom) {
         this.meetroom = meetroom;
     }
 }
