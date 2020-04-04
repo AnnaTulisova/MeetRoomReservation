@@ -1,6 +1,6 @@
 package org.example.meetroomreservation.service;
 
-import org.example.meetroomreservation.domain.ReservationViewModel;
+import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
 import org.example.meetroomreservation.domain.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 

@@ -1,19 +1,15 @@
 package org.example.meetroomreservation.controller;
 
-import org.example.meetroomreservation.domain.ReservationViewModel;
+import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
 import org.example.meetroomreservation.service.ReservationService;
 import org.example.meetroomreservation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 public class CalendarController {
 
     @Autowired
@@ -22,12 +18,10 @@ public class CalendarController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/calendar")
-    public String calendar(Map<String, Object> model) {
+    @RequestMapping(value = "/calendar", method = RequestMethod.GET, produces = "application/json")
+    public List<ReservationViewModel> calendar() {
         List<ReservationViewModel> reservations = reservationService.findReservationsWithUsers();
-
-        model.put("reservations", reservations);
-        return "calendar";
+        return reservations;
     }
 
     @GetMapping("/calendar/reservation")

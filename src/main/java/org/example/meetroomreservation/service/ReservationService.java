@@ -1,8 +1,7 @@
 package org.example.meetroomreservation.service;
 
 import org.example.meetroomreservation.domain.Reservation;
-import org.example.meetroomreservation.domain.ReservationViewModel;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
 
 import java.util.List;
 

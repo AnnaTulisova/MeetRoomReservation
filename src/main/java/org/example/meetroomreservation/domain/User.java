@@ -46,6 +46,12 @@ public class User implements UserDetails {
         this.login = login;
         this.roles = roles;
     }
+    public User(Integer id, String email, String login, Set<Role> roles) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.roles = roles;
+    }
 
     public  Integer getId(){
         return id;

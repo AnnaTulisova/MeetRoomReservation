@@ -1,8 +1,9 @@
 package org.example.meetroomreservation.service.implementations;
 
-import org.example.meetroomreservation.domain.Reservation;
-import org.example.meetroomreservation.domain.ReservationViewModel;
-import org.example.meetroomreservation.domain.User;
+import org.example.meetroomreservation.domain.*;
+import org.example.meetroomreservation.domain.viewModels.MeetroomViewModel;
+import org.example.meetroomreservation.domain.viewModels.ReservationViewModel;
+import org.example.meetroomreservation.domain.viewModels.UserViewModel;
 import org.example.meetroomreservation.repos.ReservationRepository;
 import org.example.meetroomreservation.service.MeetroomService;
 import org.example.meetroomreservation.service.ReservationService;
@@ -83,7 +84,8 @@ public class ReservationServiceImplem implements ReservationService {
             oldReservation.setDuration(LocalTime.parse(duration));
         }
         if(!oldReservation.getMeetroom().getId().equals(newMeetroomId)) {
-            oldReservation.setMeetroom(meetroomService.findById(newMeetroomId));
+            Meetroom newMeetroom = meetroomService.findById(newMeetroomId);
+            oldReservation.setMeetroom(new MeetroomViewModel(newMeetroom.getId(), newMeetroom.getName(), newMeetroom.getLocation()));
         }
         //save current reservation in DB
         saveChanges(oldReservation, datetime, meetroomId);
@@ -115,13 +117,16 @@ public class ReservationServiceImplem implements ReservationService {
         List<Reservation> originalReservations = findTotalReservations();
         List<ReservationViewModel> reservations = new java.util.ArrayList<>(Collections.emptyList());
         for (Reservation r : originalReservations) {
-            List<User> usersForOneReserv =
+            List<UserViewModel> usersForOneReserv =
                     findByDatetimeAndMeetroomId(r.getDatetime().toString(), r.getMeetroom().getId())
                     .stream()
-                    .map(x->new User(x.getUser().getId(), x.getUser().getEmail()))
+                    .map(x->new UserViewModel(x.getUser().getId(), x.getUser().getEmail(), x.getUser().getLogin()))
                     .collect(Collectors.toList());
+
+            MeetroomViewModel meetroom = new MeetroomViewModel(r.getMeetroom().getId(), r.getMeetroom().getName(), r.getMeetroom().getLocation());
+
             ReservationViewModel reservationViewModel = new ReservationViewModel(r.getId(), r.getDatetime(),
-                                                            r.getDuration(), usersForOneReserv, r.getMeetroom());
+                                                            r.getDuration(), usersForOneReserv, meetroom);
             reservations.add(reservationViewModel);
         }
         return reservations;
@@ -129,20 +134,22 @@ public class ReservationServiceImplem implements ReservationService {
     public ReservationViewModel findReservationsWithUsers(String datetime, Integer meetroomId) {
         Reservation reservation = findByDatetimeAndMeetroomId(datetime, meetroomId).get(0);
         ReservationViewModel reservationViewModel = new ReservationViewModel();
-        List<User> usersForOneReserv =
+        List<UserViewModel> usersForOneReserv =
                     findByDatetimeAndMeetroomId(datetime, meetroomId)
                             .stream()
-                            .map(x->new User(x.getUser().getId(), x.getUser().getEmail()))
+                            .map(x->new UserViewModel(x.getUser().getId(), x.getUser().getEmail(), x.getUser().getLogin()))
                             .collect(Collectors.toList());
+        MeetroomViewModel meetroomViewModel = new MeetroomViewModel(reservation.getMeetroom().getId(), reservation.getMeetroom().getName(),
+                                            reservation.getMeetroom().getLocation());
         reservationViewModel = new ReservationViewModel(reservation.getId(), reservation.getDatetime(), reservation.getDuration(),
-                                usersForOneReserv, reservation.getMeetroom());
+                                usersForOneReserv, meetroomViewModel);
         return reservationViewModel;
     }
 
     public void saveChanges(ReservationViewModel reservationViewModel, String datetime, Integer meetroomId) {
         List<Reservation> oldReservations = findByDatetimeAndMeetroomId(datetime, meetroomId);
         for (Reservation r : oldReservations) {
-            r.setMeetroom(reservationViewModel.getMeetroom());
+            r.setMeetroom(meetroomService.findById(reservationViewModel.getMeetroom().getId()));
             r.setDatetime(reservationViewModel.getDatetime());
             r.setDuration(reservationViewModel.getDuration());
             save(r);
@@ -159,7 +166,7 @@ public class ReservationServiceImplem implements ReservationService {
         List<User> users = userService.getUsersByIds(usersIds);
         for (User user : users) {
             Reservation reservation = new Reservation( reservationViewModel.getDatetime(), reservationViewModel.getDuration(),
-                                        user, reservationViewModel.getMeetroom());
+                                        user, meetroomService.findById(reservationViewModel.getMeetroom().getId()));
             save(reservation);
         }
     }
