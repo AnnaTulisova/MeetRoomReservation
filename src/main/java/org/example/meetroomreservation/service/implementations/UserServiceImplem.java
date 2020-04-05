@@ -8,6 +8,7 @@ import org.example.meetroomreservation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 public class UserServiceImplem implements UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
 
     public User findByEmail(String email){
         return userRepository.findByEmail(email);
@@ -73,6 +77,6 @@ public class UserServiceImplem implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email);
+            return userRepository.findByEmail(email);
     }
 }
