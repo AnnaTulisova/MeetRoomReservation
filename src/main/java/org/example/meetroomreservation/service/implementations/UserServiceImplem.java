@@ -1,14 +1,13 @@
 package org.example.meetroomreservation.service.implementations;
 
-import org.example.meetroomreservation.domain.viewModels.ReservationView;
 import org.example.meetroomreservation.domain.User;
+import org.example.meetroomreservation.domain.viewModels.ReservationView;
 import org.example.meetroomreservation.domain.viewModels.UserView;
 import org.example.meetroomreservation.repos.UserRepository;
 import org.example.meetroomreservation.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,9 +20,6 @@ import java.util.stream.Collectors;
 public class UserServiceImplem implements UserService {
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder encoder;
 
     public User findByEmail(String email){
         return userRepository.findByEmail(email);

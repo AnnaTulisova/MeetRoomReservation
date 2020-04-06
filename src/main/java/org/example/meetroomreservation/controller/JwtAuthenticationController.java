@@ -1,9 +1,9 @@
 package org.example.meetroomreservation.controller;
 
-import org.example.meetroomreservation.domain.jwt.JwtRequest;
-import org.example.meetroomreservation.domain.jwt.JwtResponse;
-import org.example.meetroomreservation.domain.jwt.JwtTokenUtil;
-import org.example.meetroomreservation.service.UserService;
+import java.util.Objects;
+
+
+import org.example.meetroomreservation.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +11,17 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.example.meetroomreservation.service.UserService;
+
+
+import org.example.meetroomreservation.config.JwtTokenUtil;
+import org.example.meetroomreservation.domain.jwt.*;
+
 
 @RestController
 @CrossOrigin
@@ -28,7 +38,9 @@ public class JwtAuthenticationController {
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 

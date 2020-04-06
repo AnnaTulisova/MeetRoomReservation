@@ -1,7 +1,5 @@
 package org.example.meetroomreservation.domain.jwt;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import java.io.Serializable;
 
 public class JwtRequest implements Serializable {
@@ -14,12 +12,12 @@ public class JwtRequest implements Serializable {
     public JwtRequest() { }
 
     public JwtRequest(String username, String password) {
-        this.setUsername(username);
-        this.setPassword(password);
+        this.username = username;
+        this.password = password;
     }
 
     public String getUsername() {
-        return this.username;
+        return username;
     }
 
     public void setUsername(String username) {
@@ -27,7 +25,7 @@ public class JwtRequest implements Serializable {
     }
 
     public String getPassword() {
-        return this.password;
+        return password;
     }
 
     public void setPassword(String password) {
